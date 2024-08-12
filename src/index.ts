@@ -4,14 +4,14 @@ import { GenerationTaskPollingData } from "./types";
 
 
 // Настройки для FusionBrain
-const FUSION_BRAIN_API_KEY = '';
-const FUSTION_BRAIN_SECRET_KEY = '';
+const FUSION_BRAIN_API_KEY = '2BE11A47E80F4D4155DF50D074B968B9';
+const FUSTION_BRAIN_SECRET_KEY = '76E5AABD2FC5E083B1B8DC106A97E56B';
 
 // Настройки для OpenAI
 const OPENAI_API_KEY = '';
 
 // Настройки для телеграм бота
-const TELEGRAM_API_KEY = '';
+const TELEGRAM_API_KEY = '6876087001:AAGby6Pf8LiyZT0HEiv9Hm18BEh4gBrAtFg';
 
 
 
