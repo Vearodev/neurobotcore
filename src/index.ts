@@ -1,6 +1,6 @@
-import { FusionBrain } from "./FusionBrain";
+
 import TelegramBot from 'node-telegram-bot-api'
-import { GenerationTaskPollingData } from "./types";
+import { FusionBrain } from './services/neural-networks/fusion-brain';
 
 
 // Настройки для FusionBrain
@@ -39,7 +39,7 @@ bot.onText(/\/fb (.+)/, async (msg, match) => {
         });
 
 
-        const data: any = await Brain1.CreateGenerateQuery(command)
+        const data: any = await Brain1.Text2Image(command)
         
 
         if(data && data.censored) {

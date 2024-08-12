@@ -1,7 +1,8 @@
 import fetch from 'node-fetch';
 import { consola } from "consola";
-import { CreateTask, FusionBrainConfig, GenerationTaskPollingData, ImageStyle, Model } from './types';
 import FormData from 'form-data';
+import { FusionBrainModel, FusionBrainText2ImageCreationResponse, FusionBrainText2ImageCreationTask, FusionBrainText2ImageStyle } from './types';
+import { FusionBrainConfig } from '../../../types';
 
 
 const API_URL = 'https://api-key.fusionbrain.ai';
@@ -12,14 +13,12 @@ const MODELS_URL = API_URL + '/key/api/v1/models';
 
 
 export class FusionBrain {
-    // Храним список задач на генерацию
-    private tasksPool: CreateTask[] = []
 
     // Храним загруженные доступные стили изображений
-    private styles: ImageStyle[] = [];
+    private styles: FusionBrainText2ImageStyle[] = [];
 
     // Храним доступные модели нейронок
-    private models: Model[] = [];
+    private models: FusionBrainModel[] = [];
 
     private API_KEY: string;
     private SECRET_KEY: string;
@@ -33,7 +32,7 @@ export class FusionBrain {
     }
 
 
-    public async CreateGenerateQuery(query: string, negativeQuery?: string, style?: string, modelId?: number) {
+    public async Text2Image(prompt: string, negativePrompt?: string, style?: string, modelId?: number) {
         if(this.models.length < 1) throw new Error()
 
         try {
@@ -43,12 +42,11 @@ export class FusionBrain {
                 width: 1024,
                 height: 1024,
                 num_images: 1,
-                negativePromptUnclip: negativeQuery,
+                negativePromptUnclip: negativePrompt,
                 generateParams: {
-                    query,
+                    prompt,
                 }
             }
-
 
             const form = new FormData();
             form.append('params', JSON.stringify(queryParams), { contentType: 'application/json' });
@@ -56,16 +54,13 @@ export class FusionBrain {
             
             const response = await fetch(TEXT2IMAGE_URL, {
                 method: 'POST',
-                headers: {
-                    ...this.CreateHeaders()
-                },
+                headers: this.CreateHeaders(),
                 body: form
             })
-            const task: CreateTask = await response.json()
+            const task: FusionBrainText2ImageCreationResponse = await response.json()
             
             if(task.status = 'INITIAL') {
-                console.log('tetetetetetet')
-                const data = await this.Polling(task)
+                const data = await this.Polling(TEXT2IMAGE_CHECK_URL + task.uuid, this.IsText2ImageConfitionFullfiled)
                 return data
             }
             else {
@@ -78,23 +73,22 @@ export class FusionBrain {
         }
     }
 
+    private IsText2ImageConfitionFullfiled(data: FusionBrainText2ImageCreationTask) {
+        return data.status === 'DONE' || data.censored
+    }
 
-    public async Polling(task: CreateTask) {
+
+    public async Polling(url: string, condition: (data: FusionBrainText2ImageCreationTask) => boolean) {
         while (true) {
             try {
                 // Выполняем HTTP-запрос
-                const response = await fetch(TEXT2IMAGE_CHECK_URL + task.uuid, {
+                const response = await fetch(url, {
                     headers: this.CreateHeaders()
                 })
     
-                const data: GenerationTaskPollingData = await response.json()
-    
-                // Проверяем, удовлетворяет ли ответ условию
-                if (data.status === 'DONE' || data.censored) {
-                    // Условие выполнено, выходим из цикла
-                    console.log("Условие выполнено, завершение Polling");
-                    return data;
-                }
+                const data: FusionBrainText2ImageCreationTask = await response.json()
+
+                if(condition(data)) return data
             } catch (error) {
                 // Обработка ошибок запроса
                 console.error("Ошибка запроса:", error);
