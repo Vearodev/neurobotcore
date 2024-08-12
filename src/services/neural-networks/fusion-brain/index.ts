@@ -44,7 +44,7 @@ export class FusionBrain {
                 num_images: 1,
                 negativePromptUnclip: negativePrompt,
                 generateParams: {
-                    prompt,
+                    query: prompt,
                 }
             }
 
@@ -54,19 +54,15 @@ export class FusionBrain {
             
             const response = await fetch(TEXT2IMAGE_URL, {
                 method: 'POST',
-                headers: this.CreateHeaders(),
+                headers: {
+                    ...this.CreateHeaders()
+                },
                 body: form
             })
             const task: FusionBrainText2ImageCreationResponse = await response.json()
             
-            if(task.status = 'INITIAL') {
-                const data = await this.Polling(TEXT2IMAGE_CHECK_URL + task.uuid, this.IsText2ImageConfitionFullfiled)
-                return data
-            }
-            else {
-                throw new Error('')
-            }
-    
+            if(task.status = 'INITIAL') return await this.Polling(TEXT2IMAGE_CHECK_URL + task.uuid, this.IsText2ImageConfitionFullfiled)
+            else throw new Error('')
         } catch (error) {
             consola.error(error)
             return error
@@ -79,6 +75,7 @@ export class FusionBrain {
 
 
     public async Polling(url: string, condition: (data: FusionBrainText2ImageCreationTask) => boolean) {
+        console.log(url)
         while (true) {
             try {
                 // Выполняем HTTP-запрос
@@ -97,11 +94,6 @@ export class FusionBrain {
             // Ждём перед следующим запросом
             await new Promise(resolve => setTimeout(resolve, 10000));
         }
-    }
-
-
-    public async GetInfoAboutTask() {
-        
     }
 
     public async Bootstrap() {
