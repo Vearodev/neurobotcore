@@ -29,3 +29,7 @@ export interface GenerationTaskPollingData {
     "errorDescription": string
     "censored": boolean
 }
+
+export interface FusionBrainAnalytics {
+    [key: string]: number
+}

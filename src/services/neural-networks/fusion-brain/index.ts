@@ -92,7 +92,7 @@ export class FusionBrain {
             }
     
             // Ждём перед следующим запросом
-            await new Promise(resolve => setTimeout(resolve, 10000));
+            await new Promise(resolve => setTimeout(resolve, 3000));
         }
     }
 

@@ -88,7 +88,7 @@ class FusionBrain {
                     console.error("Ошибка запроса:", error);
                 }
                 // Ждём перед следующим запросом
-                yield new Promise(resolve => setTimeout(resolve, 10000));
+                yield new Promise(resolve => setTimeout(resolve, 3000));
             }
         });
     }
