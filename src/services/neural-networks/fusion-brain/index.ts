@@ -2,7 +2,8 @@ import fetch from 'node-fetch';
 import { consola } from "consola";
 import FormData from 'form-data';
 import { FusionBrainModel, FusionBrainText2ImageCreationResponse, FusionBrainText2ImageCreationTask, FusionBrainText2ImageStyle } from './types';
-import { FusionBrainConfig } from '../../../types';
+import { FusionBrainConfig, TelegramService } from '../../../types';
+import { AnalitycManager } from '../../analytics/analytic';
 
 
 const API_URL = 'https://api-key.fusionbrain.ai';
@@ -12,7 +13,7 @@ const TEXT2IMAGE_CHECK_URL =  API_URL + '/key/api/v1/text2image/status/'
 const MODELS_URL = API_URL + '/key/api/v1/models';
 
 
-export class FusionBrain {
+export class FusionBrain implements TelegramService {
 
     // Храним загруженные доступные стили изображений
     private styles: FusionBrainText2ImageStyle[] = [];
@@ -23,12 +24,15 @@ export class FusionBrain {
     private API_KEY: string;
     private SECRET_KEY: string;
     
+
     constructor(config: FusionBrainConfig) {
         this.API_KEY = config.API_KEY;
         this.SECRET_KEY = config.SECRET_KEY
+    }
 
 
-        this.Bootstrap()
+    public get TriggerRegexp(): RegExp  {
+        return new RegExp(`/f (.+)/`)
     }
 
 

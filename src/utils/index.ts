@@ -1,8 +1,11 @@
-namespace Utils {
+export function GenerateRandomNumber() {
 
+}
 
+export function PrettyJSON(data: any) {
 
-    export function GenerateRandomNumber() {
+      const jsonString = JSON.stringify(data, null, 2);
+    
 
-    }
+      return  `<pre>${jsonString}</pre>`;
 }

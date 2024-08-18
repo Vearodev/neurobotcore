@@ -29,7 +29,9 @@ class FusionBrain {
         this.models = [];
         this.API_KEY = config.API_KEY;
         this.SECRET_KEY = config.SECRET_KEY;
-        this.Bootstrap();
+    }
+    get TriggerRegexp() {
+        return new RegExp(`/f (.+)/`);
     }
     Text2Image(prompt, negativePrompt, style, modelId) {
         return __awaiter(this, void 0, void 0, function* () {

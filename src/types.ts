@@ -5,6 +5,10 @@ export interface Model {
     "type": string
 }
 
+export interface TelegramService {
+    readonly TriggerRegexp: RegExp
+}
+
 export interface ImageStyle {
     name: string
     title: string
@@ -33,3 +37,16 @@ export interface GenerationTaskPollingData {
 export interface FusionBrainAnalytics {
     [key: string]: number
 }
+
+
+export type SupportedServices = 'fusion-brain' | 'chatgpt'
+
+export enum Service {
+    FusionBrain = 'fusion-brain',
+    Chatgpt = 'chatgpt'
+}
+
+export type AnalyticsDataScheme = {
+    [key in Service]: { [k: string]: number} 
+}
+
