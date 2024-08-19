@@ -17,4 +17,4 @@ COPY . .
 RUN npm run build
 
 # Указываем команду для запуска приложения
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]
