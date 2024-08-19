@@ -170,6 +170,11 @@ async function SetListeners() {
         }
 
 
+        const reaction = [{ type: 'emoji', emoji: '👍' }];
+         //@ts-ignore
+         bot.setMessageReaction(chatId, msg.message_id, { reaction: JSON.stringify(reaction) })
+
+
         const response = await Gigachat.ChatCompletion(GigchatModel.GigaChat, command!)
         const choice = response?.choices[0]?.message.content
         
