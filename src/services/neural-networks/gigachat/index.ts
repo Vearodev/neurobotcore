@@ -80,7 +80,7 @@ export class GigachatService implements TelegramService {
             const response: GigachatChatCompletionReponse = await tmp.json()
             return response
         } catch(error: any) {
-            if(error && error.status === 401) {
+            if(error.response && error.response.status === 401) {
                 await this.Auth()
                 await this.ChatCompletion(model, prompt, historyMode)
             }
