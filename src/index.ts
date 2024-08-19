@@ -142,13 +142,26 @@ async function SetListeners() {
         const command = commandExecuter(match)
 
         const chatIds = Object.keys(Analytics.data).filter(i => parseInt(i) < 0)
-        console.log(chatIds)
+
+      
 
         chatIds.forEach(id => bot.sendMessage(id, command!, {
             parse_mode: 'HTML'
         }))
     })
 
+
+    bot.onText(/\/stat/, async (msg, match) => {
+            const command = commandExecuter(match)
+
+            
+
+            bot.sendMessage(msg.chat.id, PrettyJSON(Analytics.data), {
+                reply_to_message_id: msg?.reply_to_message?.message_id,
+                parse_mode: 'HTML'
+            });
+
+        })
 
     bot.onText(/\/g (.+)/, async (msg, match) => {
         const command = commandExecuter(match)
@@ -171,9 +184,8 @@ async function SetListeners() {
 
 
         const reaction = [{ type: 'emoji', emoji: '👍' }];
-         //@ts-ignore
-         bot.setMessageReaction(msg.chat.id, msg.message_id, { reaction: JSON.stringify(reaction) })
-
+        //@ts-ignore
+        bot.setMessageReaction(msg.chat.id, msg.message_id, { reaction: JSON.stringify(reaction) })
 
         const response = await Gigachat.ChatCompletion(GigchatModel.GigaChat, command!)
         const choice = response?.choices[0]?.message.content
