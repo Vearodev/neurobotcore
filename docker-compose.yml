@@ -7,8 +7,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
-    volumes:
-      - .:/apps
+
     ports:
       - "3000:3000" 
     command: npm run start
