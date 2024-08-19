@@ -1,0 +1,16 @@
+# Настройки проекта
+
+
+# Настройки Telegram бота
+TELEGRAM_BOT_TOKEN = 
+
+
+# НЕЙРОСЕТИ
+
+# FUSION-BRAIN (KADINKSY)
+FUSION_BRAIN_API_KEY = 
+FUSTION_BRAIN_SECRET_KEY = 
+
+
+# GIGACHAT (SBERBANK)
+GIGACHAT_TOKEN = 

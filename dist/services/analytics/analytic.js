@@ -29,18 +29,25 @@ class AnalitycManager {
             return JSON.parse(fileData);
         });
     }
-    Write(service, chatId, userName) {
-        return __awaiter(this, void 0, void 0, function* () {
+    Write(service_1, chatId_1, userName_1) {
+        return __awaiter(this, arguments, void 0, function* (service, chatId, userName, increaseSize = 1) {
             try {
                 if (!this.data[chatId]) {
                     this.data[chatId] = {
-                        'chatgpt': {},
-                        'fusion-brain': {}
+                        "fusion-brain": {},
+                        "chatgpt": {},
+                        "gigachat": {}
                     };
                 }
-                if (!this.data[chatId][service][userName])
+                // Убедитесь, что объект для service существует внутри chatId
+                if (!this.data[chatId][service]) {
+                    this.data[chatId][service] = {};
+                }
+                // Убедитесь, что объект для userName существует внутри service
+                if (!this.data[chatId][service][userName]) {
                     this.data[chatId][service][userName] = 0;
-                this.data[chatId][service][userName] = this.data[chatId][service][userName] + 1;
+                }
+                this.data[chatId][service][userName] = this.data[chatId][service][userName] + increaseSize;
                 yield promises_1.default.mkdir(this.dir, { recursive: true });
                 const filePath = path_1.default.join(this.dir, `${chatId}.json`);
                 yield promises_1.default.writeFile(filePath, JSON.stringify(this.data[chatId] || {}));

@@ -20,18 +20,29 @@ export class AnalitycManager {
         return JSON.parse(fileData) as AnalyticsDataScheme
     }
 
-    public async Write(service: SupportedServices, chatId: number | string, userName: string) {
+    public async Write(service: SupportedServices, chatId: number | string, userName: string, increaseSize = 1) {
         try {
 
-            if(!this.data[chatId]) {
+            if (!this.data[chatId]) {
                 this.data[chatId] = {
-                    'chatgpt': {},
-                    'fusion-brain': {}
-                }
+                    "fusion-brain": {},
+                    "chatgpt": {},
+                    "gigachat": {}
+                };
+            }
+            
+            // Убедитесь, что объект для service существует внутри chatId
+            if (!this.data[chatId][service]) {
+                this.data[chatId][service] = {};
+            }
+            
+            // Убедитесь, что объект для userName существует внутри service
+            if (!this.data[chatId][service][userName]) {
+                this.data[chatId][service][userName] = 0;
             }
 
-            if(!this.data[chatId][service][userName])  this.data[chatId][service][userName] = 0;
-            this.data[chatId][service][userName] = this.data[chatId][service][userName] + 1
+           
+            this.data[chatId][service][userName] = this.data[chatId][service][userName] + increaseSize
 
             await fs.mkdir(this.dir, { recursive: true });
 

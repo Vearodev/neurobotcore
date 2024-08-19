@@ -27,8 +27,12 @@ class FusionBrain {
         this.styles = [];
         // Храним доступные модели нейронок
         this.models = [];
-        this.API_KEY = config.API_KEY;
-        this.SECRET_KEY = config.SECRET_KEY;
+        if (!config.API_KEY || !config.SECRET_KEY)
+            throw new Error(`${FusionBrain.name} проблема с API_KEY | SECRET_KEY`);
+        else {
+            this.API_KEY = config.API_KEY;
+            this.SECRET_KEY = config.SECRET_KEY;
+        }
     }
     get TriggerRegexp() {
         return new RegExp(`/f (.+)/`);

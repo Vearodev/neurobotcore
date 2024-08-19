@@ -12,28 +12,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("dotenv/config");
 const node_telegram_bot_api_1 = __importDefault(require("node-telegram-bot-api"));
 const fusion_brain_1 = require("./services/neural-networks/fusion-brain");
 const analytic_1 = require("./services/analytics/analytic");
 const types_1 = require("./types");
 const utils_1 = require("./utils");
-// Настройки для FusionBrain
-const FUSION_BRAIN_API_KEY = '2BE11A47E80F4D4155DF50D074B968B9';
-const FUSTION_BRAIN_SECRET_KEY = '76E5AABD2FC5E083B1B8DC106A97E56B';
-// Настройки для OpenAI
-const OPENAI_API_KEY = '';
-// Настройки для телеграм бота
-const TELEGRAM_API_KEY = '6876087001:AAGby6Pf8LiyZT0HEiv9Hm18BEh4gBrAtFg';
+const gigachat_1 = require("./services/neural-networks/gigachat");
+const path_1 = __importDefault(require("path"));
+const types_2 = require("./services/neural-networks/gigachat/types");
 // Сервис для ведения базовой аналитики
 // на данный момент считает количество запросов от конкретного пользователя в каждом из сервисов
 const Analytics = new analytic_1.AnalitycManager();
 // Сервис для генерации изображений на основе текстовых запросов 
 // с помощью нейросети FUSION BRAIN
 const FusionBrainService = new fusion_brain_1.FusionBrain({
-    API_KEY: FUSION_BRAIN_API_KEY,
-    SECRET_KEY: FUSTION_BRAIN_SECRET_KEY
+    API_KEY: process.env.FUSION_BRAIN_API_KEY,
+    SECRET_KEY: process.env.FUSTION_BRAIN_SECRET_KEY
 });
-const bot = new node_telegram_bot_api_1.default(TELEGRAM_API_KEY, { polling: true });
+const Gigachat = new gigachat_1.GigachatService(process.env.GIGACHAT_TOKEN);
+const botToken = process.env.TELEGRAM_BOT_TOKEN;
+if (!botToken)
+    throw new Error('Нет токена для бота');
+const bot = new node_telegram_bot_api_1.default(botToken, { polling: true });
 const commandExecuter = (msg) => (msg === null || msg === void 0 ? void 0 : msg.length) ? msg[1] : null;
 bot.getMe()
     .then((me) => {
@@ -118,6 +119,38 @@ function SetListeners() {
                 });
             yield FusionBrainText2ImageHandler(msg, command);
         }));
+        bot.onText(/\/news (.+)/, (msg, match) => __awaiter(this, void 0, void 0, function* () {
+            const command = commandExecuter(match);
+            const chatIds = Object.keys(Analytics.data).filter(i => parseInt(i) < 0);
+            console.log(chatIds);
+            chatIds.forEach(id => bot.sendMessage(id, command, {
+                parse_mode: 'HTML'
+            }));
+        }));
+        bot.onText(/\/g (.+)/, (msg, match) => __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c;
+            const command = commandExecuter(match);
+            if (command === 'auth') {
+                const r = yield Gigachat.Auth();
+                return bot.sendMessage(msg.chat.id, (0, utils_1.PrettyJSON)(r), {
+                    reply_to_message_id: (_a = msg === null || msg === void 0 ? void 0 : msg.reply_to_message) === null || _a === void 0 ? void 0 : _a.message_id,
+                    parse_mode: 'HTML'
+                });
+            }
+            else if (command === 'help') {
+                return bot.sendMessage(msg.chat.id, `Тут будет список команд`, {
+                    reply_to_message_id: msg.message_id
+                });
+            }
+            const response = yield Gigachat.ChatCompletion(types_2.GigchatModel.GigaChat, command);
+            const choice = (_b = response === null || response === void 0 ? void 0 : response.choices[0]) === null || _b === void 0 ? void 0 : _b.message.content;
+            yield Analytics.Write(types_1.Service.Gigachat, msg.chat.id, (_c = msg.from) === null || _c === void 0 ? void 0 : _c.username, response === null || response === void 0 ? void 0 : response.usage.total_tokens);
+            bot.sendMessage(msg.chat.id, choice, {
+                reply_to_message_id: msg.message_id,
+                parse_mode: 'Markdown'
+            });
+            //  await FusionBrainText2ImageHandler(msg, command!)
+        }));
         bot.onText(/\/roll/, (msg, match) => __awaiter(this, void 0, void 0, function* () {
             bot.sendMessage(msg.chat.id, String(Math.floor(Math.random() * 100) + 1), {
                 reply_to_message_id: msg.message_id
@@ -182,6 +215,7 @@ function SetListeners() {
 function Bootstrap() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            TLSCertsInit();
             yield Analytics.Bootstrap();
             yield FusionBrainService.Bootstrap();
         }
@@ -190,5 +224,10 @@ function Bootstrap() {
         finally {
         }
     });
+}
+function TLSCertsInit() {
+    const test = path_1.default.resolve('certs');
+    process.env.NODE_EXTRA_CA_CERTS = test;
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 //# sourceMappingURL=index.js.map

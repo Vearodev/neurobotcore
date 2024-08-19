@@ -6,7 +6,7 @@ export interface Model {
 }
 
 export interface TelegramService {
-    readonly TriggerRegexp: RegExp
+    // readonly TriggerRegexp: RegExp
 }
 
 export interface ImageStyle {
@@ -17,8 +17,8 @@ export interface ImageStyle {
 }
 
 export interface FusionBrainConfig {
-    API_KEY: string,
-    SECRET_KEY: string
+    API_KEY: string | undefined,
+    SECRET_KEY: string | undefined
 }
 
 export interface CreateTask {
@@ -39,11 +39,12 @@ export interface FusionBrainAnalytics {
 }
 
 
-export type SupportedServices = 'fusion-brain' | 'chatgpt'
+export type SupportedServices = 'fusion-brain' | 'chatgpt' | 'gigachat'
 
 export enum Service {
     FusionBrain = 'fusion-brain',
-    Chatgpt = 'chatgpt'
+    Chatgpt = 'chatgpt',
+    Gigachat = 'gigachat'
 }
 
 export type AnalyticsDataScheme = {
