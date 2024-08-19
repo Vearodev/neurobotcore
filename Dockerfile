@@ -1,5 +1,5 @@
 # Используем официальный образ Node.js с поддержкой TypeScript
-FROM node:stable
+FROM node
 
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
